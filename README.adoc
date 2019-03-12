@@ -1,0 +1,84 @@
+:compat-mode:
+== Spring-Boot-kotlin-Jpa-Rest-api
+*Technology used:*
+Kotlin , Spring , JPA , MYSQL
+
+== How to run?
+=== clone
+```
+git clone https://github.com/ahmedkabiru/spring-boot-kotlin-jpa-rest-api.git
+```
+
+=== run
+```sh
+mvn spring-boot:run
+```
+
+== spring boot kotlin sample code
+=== Controller
+```
+@RestController @RequestMapping("/customers")
+class CustomerController{
+
+    @Autowired
+    lateinit var customerService: CustomerService
+
+    @GetMapping
+    fun findAll() = customerService.getAllCustomer();
+
+    @GetMapping("/{id}")
+    fun getCustomer(@PathVariable("id") id: Long) = customerService.getCustomerById(id)
+
+    @PostMapping
+    fun saveCustomer(@RequestBody customer: Customer) = customerService.addCustomer(customer)
+
+    fun deleteCustomer(id : Long ) = customerService.deleteCustomer(id)
+
+}
+```
+=== Entity
+```
+@Entity
+data class Customer(
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+
+    @NotBlank
+    var firstName : String,
+
+    @NotBlank
+    var lastName :String,
+
+    var address : String,
+
+    var phoneNumber : String
+
+) : Serializable
+```
+
+=== Service
+```
+@Service @Transactional @RequiredArgsConstructor
+class CustomerServiceImpl(private val customerRepository: CustomerRepository):CustomerService {
+
+    override fun addCustomer(customer: Customer ) {
+        customerRepository.save(customer)
+    }
+
+    @Transactional(readOnly = true)
+    override fun getAllCustomer() : MutableList<Customer> {
+       return customerRepository.findAll()
+    }
+
+    override fun getCustomerById(id: Long) : Customer {
+       return  customerRepository.getOne(id)
+    }
+
+    override fun deleteCustomer(id: Long) {
+        customerRepository.findById(id)
+    }
+
+}
+```
+
